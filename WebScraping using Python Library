@@ -1,0 +1,1242 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "kernelspec": {
+      "display_name": "Python 3",
+      "language": "python",
+      "name": "python3"
+    },
+    "language_info": {
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "file_extension": ".py",
+      "mimetype": "text/x-python",
+      "name": "python",
+      "nbconvert_exporter": "python",
+      "pygments_lexer": "ipython3",
+      "version": "3.8.0"
+    },
+    "colab": {
+      "name": "Final_Assignment Library.ipynb",
+      "provenance": []
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "5cDaEaYwvVB_"
+      },
+      "source": [
+        "<center>\n",
+        "    <img src=\"https://s3-api.us-geo.objectstorage.softlayer.net/cf-courses-data/CognitiveClass/Logos/organization_logo/organization_logo.png\" width=\"300\" alt=\"cognitiveclass.ai logo\"  />\n",
+        "</center>\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "aqzWSMAivVCA"
+      },
+      "source": [
+        "<h1>Extracting Stock Data Using a Python Library</h1>\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "kCdrYGVyvVCA"
+      },
+      "source": [
+        "A company's stock share is a piece of the company more precisely:\n",
+        "\n",
+        "<p><b>A stock (also known as equity) is a security that represents the ownership of a fraction of a corporation. This\n",
+        "entitles the owner of the stock to a proportion of the corporation's assets and profits equal to how much stock they own. Units of stock are called \"shares.\" [1]</p></b>\n",
+        "\n",
+        "An investor can buy a stock and sell it later. If the stock price increases, the investor profits, If it decreases,the investor with incur a loss.  Determining the stock price is complex; it depends on the number of outstanding shares, the size of the company's future profits, and much more. People trade stocks throughout the day the stock ticker is a report of the price of a certain stock, updated continuously throughout the trading session by the various stock market exchanges.\n",
+        "\n",
+        "<p>You are a data scientist working for a hedge fund; it's your job to determine any suspicious stock activity. In this lab you will extract stock data using a Python library. We will use the <coode>yfinance</code> library, it allows us to extract data for stocks returning data in a pandas dataframe. You will use the lab to extract.</p>\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "d-6jkENqvVCB"
+      },
+      "source": [
+        "<h2>Table of Contents</h2>\n",
+        "<div class=\"alert alert-block alert-info\" style=\"margin-top: 20px\">\n",
+        "    <ul>\n",
+        "        <li>Using yfinance to Extract Stock Info</li>\n",
+        "        <li>Using yfinance to Extract Historical Share Price Data</li>\n",
+        "        <li>Using yfinance to Extract Historical Dividends Data</li>\n",
+        "        <li>Exercise</li>\n",
+        "    </ul>\n",
+        "<p>\n",
+        "    Estimated Time Needed: <strong>30 min</strong></p>\n",
+        "</div>\n",
+        "\n",
+        "<hr>\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Frio-uA-vVCB",
+        "outputId": "1cfabcc7-ae77-4f8f-9ef0-633e63ded3b2"
+      },
+      "source": [
+        "!pip install yfinance\n",
+        "#!pip install pandas"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "Collecting yfinance\n",
+            "  Downloading https://files.pythonhosted.org/packages/5e/4e/88d31f5509edcbc51bcbb7eeae72516b17ada1bc2ad5b496e2d05d62c696/yfinance-0.1.60.tar.gz\n",
+            "Requirement already satisfied: pandas>=0.24 in /usr/local/lib/python3.7/dist-packages (from yfinance) (1.1.5)\n",
+            "Requirement already satisfied: numpy>=1.15 in /usr/local/lib/python3.7/dist-packages (from yfinance) (1.19.5)\n",
+            "Requirement already satisfied: requests>=2.20 in /usr/local/lib/python3.7/dist-packages (from yfinance) (2.23.0)\n",
+            "Requirement already satisfied: multitasking>=0.0.7 in /usr/local/lib/python3.7/dist-packages (from yfinance) (0.0.9)\n",
+            "Collecting lxml>=4.5.1\n",
+            "\u001b[?25l  Downloading https://files.pythonhosted.org/packages/30/c0/d0526314971fc661b083ab135747dc68446a3022686da8c16d25fcf6ef07/lxml-4.6.3-cp37-cp37m-manylinux2014_x86_64.whl (6.3MB)\n",
+            "\u001b[K     |████████████████████████████████| 6.3MB 6.4MB/s \n",
+            "\u001b[?25hRequirement already satisfied: pytz>=2017.2 in /usr/local/lib/python3.7/dist-packages (from pandas>=0.24->yfinance) (2018.9)\n",
+            "Requirement already satisfied: python-dateutil>=2.7.3 in /usr/local/lib/python3.7/dist-packages (from pandas>=0.24->yfinance) (2.8.1)\n",
+            "Requirement already satisfied: chardet<4,>=3.0.2 in /usr/local/lib/python3.7/dist-packages (from requests>=2.20->yfinance) (3.0.4)\n",
+            "Requirement already satisfied: idna<3,>=2.5 in /usr/local/lib/python3.7/dist-packages (from requests>=2.20->yfinance) (2.10)\n",
+            "Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.7/dist-packages (from requests>=2.20->yfinance) (2021.5.30)\n",
+            "Requirement already satisfied: urllib3!=1.25.0,!=1.25.1,<1.26,>=1.21.1 in /usr/local/lib/python3.7/dist-packages (from requests>=2.20->yfinance) (1.24.3)\n",
+            "Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.7/dist-packages (from python-dateutil>=2.7.3->pandas>=0.24->yfinance) (1.15.0)\n",
+            "Building wheels for collected packages: yfinance\n",
+            "  Building wheel for yfinance (setup.py) ... \u001b[?25l\u001b[?25hdone\n",
+            "  Created wheel for yfinance: filename=yfinance-0.1.60-py2.py3-none-any.whl size=23819 sha256=54c477c2906b8316491bcb753eabfd07cdaef604d0799f087041a3db0b9e9552\n",
+            "  Stored in directory: /root/.cache/pip/wheels/f0/be/a4/846f02c5985562250917b0ab7b33fff737c8e6e8cd5209aa3b\n",
+            "Successfully built yfinance\n",
+            "Installing collected packages: lxml, yfinance\n",
+            "  Found existing installation: lxml 4.2.6\n",
+            "    Uninstalling lxml-4.2.6:\n",
+            "      Successfully uninstalled lxml-4.2.6\n",
+            "Successfully installed lxml-4.6.3 yfinance-0.1.60\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "VaBHBGVTvVCB"
+      },
+      "source": [
+        "import yfinance as yf\n",
+        "import pandas as pd"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "TGqraOB6vVCC"
+      },
+      "source": [
+        "## Using the yfinance Library to Extract Stock Data\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "pkPJ9yMEvVCC"
+      },
+      "source": [
+        "Using the `Ticker` module we can create an object that will allow us to access functions to extract data. To do this we need to provide the ticker symbol for the stock, here the company is Apple and the ticker symbol is `AAPL`.\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "Fvgz3eIwvVCC"
+      },
+      "source": [
+        "apple = yf.Ticker(\"AAPL\")"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "wFN9IdDYvVCC"
+      },
+      "source": [
+        "Now we can access functions and variables to extract the type of data we need. You can view them and what they represent here https://aroussi.com/post/python-yahoo-finance.\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "-ql2222PvVCC"
+      },
+      "source": [
+        "### Stock Info\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "alUeVLaPvVCC"
+      },
+      "source": [
+        "Using the attribute  <code>info</code> we can extract information about the stock as a Python dictionary.\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "tF3ZK6_qvVCD",
+        "outputId": "70a263bc-d1e9-4f4f-e296-0c2d0a4468ab"
+      },
+      "source": [
+        "apple_info=apple.info\n",
+        "apple_info"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "{'52WeekChange': 0.48319888,\n",
+              " 'SandP52WeekChange': 0.3780048,\n",
+              " 'address1': 'One Apple Park Way',\n",
+              " 'algorithm': None,\n",
+              " 'annualHoldingsTurnover': None,\n",
+              " 'annualReportExpenseRatio': None,\n",
+              " 'ask': 0,\n",
+              " 'askSize': 3200,\n",
+              " 'averageDailyVolume10Day': 71544366,\n",
+              " 'averageVolume': 82586153,\n",
+              " 'averageVolume10days': 71544366,\n",
+              " 'beta': 1.208152,\n",
+              " 'beta3Year': None,\n",
+              " 'bid': 0,\n",
+              " 'bidSize': 1400,\n",
+              " 'bookValue': 4.146,\n",
+              " 'category': None,\n",
+              " 'circulatingSupply': None,\n",
+              " 'city': 'Cupertino',\n",
+              " 'companyOfficers': [],\n",
+              " 'country': 'United States',\n",
+              " 'currency': 'USD',\n",
+              " 'currentPrice': 144.57,\n",
+              " 'currentRatio': 1.142,\n",
+              " 'dateShortInterest': 1623715200,\n",
+              " 'dayHigh': 144.89,\n",
+              " 'dayLow': 142.66,\n",
+              " 'debtToEquity': 194.78,\n",
+              " 'dividendRate': 0.88,\n",
+              " 'dividendYield': 0.0063,\n",
+              " 'earningsGrowth': 1.188,\n",
+              " 'earningsQuarterlyGrowth': 1.101,\n",
+              " 'ebitda': 99820003328,\n",
+              " 'ebitdaMargins': 0.30675,\n",
+              " 'enterpriseToEbitda': 24.048,\n",
+              " 'enterpriseToRevenue': 7.377,\n",
+              " 'enterpriseValue': 2400511852544,\n",
+              " 'exDividendDate': 1620345600,\n",
+              " 'exchange': 'NMS',\n",
+              " 'exchangeTimezoneName': 'America/New_York',\n",
+              " 'exchangeTimezoneShortName': 'EDT',\n",
+              " 'expireDate': None,\n",
+              " 'fiftyDayAverage': 129.89424,\n",
+              " 'fiftyTwoWeekHigh': 145.09,\n",
+              " 'fiftyTwoWeekLow': 89.145,\n",
+              " 'financialCurrency': 'USD',\n",
+              " 'fiveYearAverageReturn': None,\n",
+              " 'fiveYearAvgDividendYield': 1.32,\n",
+              " 'floatShares': 16670609616,\n",
+              " 'forwardEps': 5.34,\n",
+              " 'forwardPE': 27.073034,\n",
+              " 'freeCashflow': 80121004032,\n",
+              " 'fromCurrency': None,\n",
+              " 'fullTimeEmployees': 100000,\n",
+              " 'fundFamily': None,\n",
+              " 'fundInceptionDate': None,\n",
+              " 'gmtOffSetMilliseconds': '-14400000',\n",
+              " 'grossMargins': 0.39881,\n",
+              " 'grossProfits': 104956000000,\n",
+              " 'heldPercentInsiders': 0.00066,\n",
+              " 'heldPercentInstitutions': 0.58539003,\n",
+              " 'impliedSharesOutstanding': None,\n",
+              " 'industry': 'Consumer Electronics',\n",
+              " 'isEsgPopulated': False,\n",
+              " 'lastCapGain': None,\n",
+              " 'lastDividendDate': 1620345600,\n",
+              " 'lastDividendValue': 0.22,\n",
+              " 'lastFiscalYearEnd': 1601078400,\n",
+              " 'lastMarket': None,\n",
+              " 'lastSplitDate': 1598832000,\n",
+              " 'lastSplitFactor': '4:1',\n",
+              " 'legalType': None,\n",
+              " 'logo_url': 'https://logo.clearbit.com/apple.com',\n",
+              " 'longBusinessSummary': 'Apple Inc. designs, manufactures, and markets smartphones, personal computers, tablets, wearables, and accessories worldwide. It also sells various related services. The company offers iPhone, a line of smartphones; Mac, a line of personal computers; iPad, a line of multi-purpose tablets; and wearables, home, and accessories comprising AirPods, Apple TV, Apple Watch, Beats products, HomePod, iPod touch, and other Apple-branded and third-party accessories. It also provides AppleCare support services; cloud services store services; and operates various platforms, including the App Store, that allow customers to discover and download applications and digital content, such as books, music, video, games, and podcasts. In addition, the company offers various services, such as Apple Arcade, a game subscription service; Apple Music, which offers users a curated listening experience with on-demand radio stations; Apple News+, a subscription news and magazine service; Apple TV+, which offers exclusive original content; Apple Card, a co-branded credit card; and Apple Pay, a cashless payment service, as well as licenses its intellectual property. The company serves consumers, and small and mid-sized businesses; and the education, enterprise, and government markets. It sells and delivers third-party applications for its products through the App Store. The company also sells its products through its retail and online stores, and direct sales force; and third-party cellular network carriers, wholesalers, retailers, and resellers. Apple Inc. was founded in 1977 and is headquartered in Cupertino, California.',\n",
+              " 'longName': 'Apple Inc.',\n",
+              " 'market': 'us_market',\n",
+              " 'marketCap': 2412526436352,\n",
+              " 'maxAge': 1,\n",
+              " 'maxSupply': None,\n",
+              " 'messageBoardId': 'finmb_24937',\n",
+              " 'morningStarOverallRating': None,\n",
+              " 'morningStarRiskRating': None,\n",
+              " 'mostRecentQuarter': 1616803200,\n",
+              " 'navPrice': None,\n",
+              " 'netIncomeToCommon': 76311003136,\n",
+              " 'nextFiscalYearEnd': 1664150400,\n",
+              " 'numberOfAnalystOpinions': 39,\n",
+              " 'open': 143.535,\n",
+              " 'openInterest': None,\n",
+              " 'operatingCashflow': 99590995968,\n",
+              " 'operatingMargins': 0.27321,\n",
+              " 'payoutRatio': 0.1834,\n",
+              " 'pegRatio': 1.53,\n",
+              " 'phone': '408-996-1010',\n",
+              " 'previousClose': 142.02,\n",
+              " 'priceHint': 2,\n",
+              " 'priceToBook': 34.869755,\n",
+              " 'priceToSalesTrailing12Months': 7.4138966,\n",
+              " 'profitMargins': 0.23451,\n",
+              " 'quickRatio': 0.967,\n",
+              " 'quoteType': 'EQUITY',\n",
+              " 'recommendationKey': 'buy',\n",
+              " 'recommendationMean': 2,\n",
+              " 'regularMarketDayHigh': 144.89,\n",
+              " 'regularMarketDayLow': 142.66,\n",
+              " 'regularMarketOpen': 143.535,\n",
+              " 'regularMarketPreviousClose': 142.02,\n",
+              " 'regularMarketPrice': 144.57,\n",
+              " 'regularMarketVolume': 104591949,\n",
+              " 'returnOnAssets': 0.169,\n",
+              " 'returnOnEquity': 1.034,\n",
+              " 'revenueGrowth': 0.536,\n",
+              " 'revenuePerShare': 19.143,\n",
+              " 'revenueQuarterlyGrowth': None,\n",
+              " 'sector': 'Technology',\n",
+              " 'sharesOutstanding': 16687599616,\n",
+              " 'sharesPercentSharesOut': 0.0064999997,\n",
+              " 'sharesShort': 108937943,\n",
+              " 'sharesShortPreviousMonthDate': 1620950400,\n",
+              " 'sharesShortPriorMonth': 94747255,\n",
+              " 'shortName': 'Apple Inc.',\n",
+              " 'shortPercentOfFloat': 0.0064999997,\n",
+              " 'shortRatio': 1.52,\n",
+              " 'startDate': None,\n",
+              " 'state': 'CA',\n",
+              " 'strikePrice': None,\n",
+              " 'symbol': 'AAPL',\n",
+              " 'targetHighPrice': 185,\n",
+              " 'targetLowPrice': 125,\n",
+              " 'targetMeanPrice': 159.34,\n",
+              " 'targetMedianPrice': 160,\n",
+              " 'threeYearAverageReturn': None,\n",
+              " 'toCurrency': None,\n",
+              " 'totalAssets': None,\n",
+              " 'totalCash': 69833998336,\n",
+              " 'totalCashPerShare': 4.185,\n",
+              " 'totalDebt': 134744997888,\n",
+              " 'totalRevenue': 325405999104,\n",
+              " 'tradeable': False,\n",
+              " 'trailingAnnualDividendRate': 0.82,\n",
+              " 'trailingAnnualDividendYield': 0.0057738344,\n",
+              " 'trailingEps': 4.449,\n",
+              " 'trailingPE': 32.494946,\n",
+              " 'twoHundredDayAverage': 129.42918,\n",
+              " 'volume': 104591949,\n",
+              " 'volume24Hr': None,\n",
+              " 'volumeAllCurrencies': None,\n",
+              " 'website': 'http://www.apple.com',\n",
+              " 'yield': None,\n",
+              " 'ytdReturn': None,\n",
+              " 'zip': '95014'}"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 4
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "h8uN2g-FvVCD"
+      },
+      "source": [
+        "We can get the <code>'country'</code> using the key country\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 35
+        },
+        "id": "mdeOXRuzvVCD",
+        "outputId": "a0733e16-97ea-432a-e7ea-46c7af649888"
+      },
+      "source": [
+        "apple_info['country']"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "application/vnd.google.colaboratory.intrinsic+json": {
+              "type": "string"
+            },
+            "text/plain": [
+              "'United States'"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 5
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "ogYNF2TpvVCD"
+      },
+      "source": [
+        "### Extracting Share Price\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "et1Wn-cTvVCD"
+      },
+      "source": [
+        "A share is the single smallest part of a company's stock  that you can buy, the prices of these shares fluctuate over time. Using the <code>history()</code> method we can get the share price of the stock over a certain period of time. Using the `period` parameter we can set how far back from the present to get data. The options for `period` are 1 day (1d), 5d, 1 month (1mo) , 3mo, 6mo, 1 year (1y), 2y, 5y, 10y, ytd, and max.\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "GUaXPghMvVCD"
+      },
+      "source": [
+        "apple_share_price_data = apple.history(period=\"max\")"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "SzPbj4D_vVCD"
+      },
+      "source": [
+        "The format that the data is returned in is a Pandas DataFrame. With the `Date` as the index the share `Open`, `High`, `Low`, `Close`, `Volume`, and `Stock Splits` are given for each day.\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 235
+        },
+        "id": "LTo7COQovVCD",
+        "outputId": "21a66e21-9ec4-49e7-ba00-b0ba0ac9ddda"
+      },
+      "source": [
+        "apple_share_price_data.head()"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>Open</th>\n",
+              "      <th>High</th>\n",
+              "      <th>Low</th>\n",
+              "      <th>Close</th>\n",
+              "      <th>Volume</th>\n",
+              "      <th>Dividends</th>\n",
+              "      <th>Stock Splits</th>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Date</th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>1980-12-12</th>\n",
+              "      <td>0.100751</td>\n",
+              "      <td>0.101189</td>\n",
+              "      <td>0.100751</td>\n",
+              "      <td>0.100751</td>\n",
+              "      <td>469033600</td>\n",
+              "      <td>0.0</td>\n",
+              "      <td>0.0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1980-12-15</th>\n",
+              "      <td>0.095933</td>\n",
+              "      <td>0.095933</td>\n",
+              "      <td>0.095495</td>\n",
+              "      <td>0.095495</td>\n",
+              "      <td>175884800</td>\n",
+              "      <td>0.0</td>\n",
+              "      <td>0.0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1980-12-16</th>\n",
+              "      <td>0.088923</td>\n",
+              "      <td>0.088923</td>\n",
+              "      <td>0.088485</td>\n",
+              "      <td>0.088485</td>\n",
+              "      <td>105728000</td>\n",
+              "      <td>0.0</td>\n",
+              "      <td>0.0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1980-12-17</th>\n",
+              "      <td>0.090676</td>\n",
+              "      <td>0.091114</td>\n",
+              "      <td>0.090676</td>\n",
+              "      <td>0.090676</td>\n",
+              "      <td>86441600</td>\n",
+              "      <td>0.0</td>\n",
+              "      <td>0.0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1980-12-18</th>\n",
+              "      <td>0.093304</td>\n",
+              "      <td>0.093742</td>\n",
+              "      <td>0.093304</td>\n",
+              "      <td>0.093304</td>\n",
+              "      <td>73449600</td>\n",
+              "      <td>0.0</td>\n",
+              "      <td>0.0</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>"
+            ],
+            "text/plain": [
+              "                Open      High       Low  ...     Volume  Dividends  Stock Splits\n",
+              "Date                                      ...                                    \n",
+              "1980-12-12  0.100751  0.101189  0.100751  ...  469033600        0.0           0.0\n",
+              "1980-12-15  0.095933  0.095933  0.095495  ...  175884800        0.0           0.0\n",
+              "1980-12-16  0.088923  0.088923  0.088485  ...  105728000        0.0           0.0\n",
+              "1980-12-17  0.090676  0.091114  0.090676  ...   86441600        0.0           0.0\n",
+              "1980-12-18  0.093304  0.093742  0.093304  ...   73449600        0.0           0.0\n",
+              "\n",
+              "[5 rows x 7 columns]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 7
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "lkb8GigYvVCD"
+      },
+      "source": [
+        "We can reset the index of the DataFrame with the `reset_index` function. We also set the `inplace` paramter to `True` so the change takes place to the DataFrame itself.\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "96wBNqWvvVCE"
+      },
+      "source": [
+        "apple_share_price_data.reset_index(inplace=True)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "JDv3fXd-vVCE"
+      },
+      "source": [
+        "We can plot the `Open` price against the `Date`:\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 286
+        },
+        "id": "VKvHYOJ7vVCE",
+        "outputId": "0a1fe6a3-871d-4c77-8437-2e51fbd14f89"
+      },
+      "source": [
+        "apple_share_price_data.plot(x=\"Date\", y=\"Open\")"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "<matplotlib.axes._subplots.AxesSubplot at 0x7fe3fda8c850>"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 9
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "image/png": "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\n",
+            "text/plain": [
+              "<Figure size 432x288 with 1 Axes>"
+            ]
+          },
+          "metadata": {
+            "tags": [],
+            "needs_background": "light"
+          }
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "4yDCIkq-vVCE"
+      },
+      "source": [
+        "### Extracting Dividends\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "84pQLjxbvVCE"
+      },
+      "source": [
+        "Dividends are the distribution of a companys profits to shareholders. In this case they are defined as an amount of money returned per share an investor owns. Using the variable `dividends` we can get a dataframe of the data. The period of the data is given by the period defined in the 'history\\` function.\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "S6QcQUhwvVCE",
+        "outputId": "730be9b4-822a-4797-e2a4-a7856daf8b38"
+      },
+      "source": [
+        "apple.dividends"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Date\n",
+              "1987-05-11    0.000536\n",
+              "1987-08-10    0.000536\n",
+              "1987-11-17    0.000714\n",
+              "1988-02-12    0.000714\n",
+              "1988-05-16    0.000714\n",
+              "                ...   \n",
+              "2020-05-08    0.205000\n",
+              "2020-08-07    0.205000\n",
+              "2020-11-06    0.205000\n",
+              "2021-02-05    0.205000\n",
+              "2021-05-07    0.220000\n",
+              "Name: Dividends, Length: 71, dtype: float64"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 10
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "TnCjJU55vVCE"
+      },
+      "source": [
+        "We can plot the dividends overtime:\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 286
+        },
+        "id": "dLhDPSOdvVCE",
+        "outputId": "616c3235-b439-4cfd-917d-34e64725193f"
+      },
+      "source": [
+        "apple.dividends.plot()"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "<matplotlib.axes._subplots.AxesSubplot at 0x7fe3fdad4a50>"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 11
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "image/png": "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\n",
+            "text/plain": [
+              "<Figure size 432x288 with 1 Axes>"
+            ]
+          },
+          "metadata": {
+            "tags": [],
+            "needs_background": "light"
+          }
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "M798nM5OvVCE"
+      },
+      "source": [
+        "## Exercise\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "XCyXZGXzvVCE"
+      },
+      "source": [
+        "Now using the `Ticker` module create an object for AMD (Advanced Micro Devices) with the ticker symbol is `AMD` called; name the object <code>amd</code>.\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "Azk4tfiYvVCE"
+      },
+      "source": [
+        "amd = yf.Ticker(\"AMD\")"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "d3CuMoRhvVCF"
+      },
+      "source": [
+        "<b>Question 1</b> Use the key  <code>'country'</code> to find the country the stock belongs to, remember it as it will be a quiz question.\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "SqcEomNZvVCF",
+        "outputId": "7796efb3-972a-4c0f-9883-858fbada7f57"
+      },
+      "source": [
+        "amd_info = amd.info\n",
+        "amd_info"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "{'52WeekChange': 0.64984286,\n",
+              " 'SandP52WeekChange': 0.3780048,\n",
+              " 'address1': '2485 Augustine Drive',\n",
+              " 'algorithm': None,\n",
+              " 'annualHoldingsTurnover': None,\n",
+              " 'annualReportExpenseRatio': None,\n",
+              " 'ask': 0,\n",
+              " 'askSize': 800,\n",
+              " 'averageDailyVolume10Day': 50232200,\n",
+              " 'averageVolume': 43673703,\n",
+              " 'averageVolume10days': 50232200,\n",
+              " 'beta': 2.030978,\n",
+              " 'beta3Year': None,\n",
+              " 'bid': 0,\n",
+              " 'bidSize': 1300,\n",
+              " 'bookValue': 5.331,\n",
+              " 'category': None,\n",
+              " 'circulatingSupply': None,\n",
+              " 'city': 'Santa Clara',\n",
+              " 'companyOfficers': [],\n",
+              " 'country': 'United States',\n",
+              " 'currency': 'USD',\n",
+              " 'currentPrice': 90.54,\n",
+              " 'currentRatio': 2.513,\n",
+              " 'dateShortInterest': 1623715200,\n",
+              " 'dayHigh': 95.43,\n",
+              " 'dayLow': 90.31,\n",
+              " 'debtToEquity': 8.507,\n",
+              " 'dividendRate': None,\n",
+              " 'dividendYield': None,\n",
+              " 'earningsGrowth': 2.318,\n",
+              " 'earningsQuarterlyGrowth': 2.426,\n",
+              " 'ebitda': 2208000000,\n",
+              " 'ebitdaMargins': 0.19331,\n",
+              " 'enterpriseToEbitda': 50.526,\n",
+              " 'enterpriseToRevenue': 9.767,\n",
+              " 'enterpriseValue': 111561916416,\n",
+              " 'exDividendDate': 798940800,\n",
+              " 'exchange': 'NMS',\n",
+              " 'exchangeTimezoneName': 'America/New_York',\n",
+              " 'exchangeTimezoneShortName': 'EDT',\n",
+              " 'expireDate': None,\n",
+              " 'fiftyDayAverage': 83.011215,\n",
+              " 'fiftyTwoWeekHigh': 99.23,\n",
+              " 'fiftyTwoWeekLow': 52.26,\n",
+              " 'financialCurrency': 'USD',\n",
+              " 'fiveYearAverageReturn': None,\n",
+              " 'fiveYearAvgDividendYield': None,\n",
+              " 'floatShares': 1208326210,\n",
+              " 'forwardEps': 2.7,\n",
+              " 'forwardPE': 33.533333,\n",
+              " 'freeCashflow': 1334249984,\n",
+              " 'fromCurrency': None,\n",
+              " 'fullTimeEmployees': 12600,\n",
+              " 'fundFamily': None,\n",
+              " 'fundInceptionDate': None,\n",
+              " 'gmtOffSetMilliseconds': '-14400000',\n",
+              " 'grossMargins': 0.44791,\n",
+              " 'grossProfits': 4347000000,\n",
+              " 'heldPercentInsiders': 0.00522,\n",
+              " 'heldPercentInstitutions': 0.70395,\n",
+              " 'impliedSharesOutstanding': None,\n",
+              " 'industry': 'Semiconductors',\n",
+              " 'isEsgPopulated': False,\n",
+              " 'lastCapGain': None,\n",
+              " 'lastDividendDate': None,\n",
+              " 'lastDividendValue': None,\n",
+              " 'lastFiscalYearEnd': 1608940800,\n",
+              " 'lastMarket': None,\n",
+              " 'lastSplitDate': 966902400,\n",
+              " 'lastSplitFactor': '2:1',\n",
+              " 'legalType': None,\n",
+              " 'logo_url': 'https://logo.clearbit.com/amd.com',\n",
+              " 'longBusinessSummary': 'Advanced Micro Devices, Inc. operates as a semiconductor company worldwide. The company operates in two segments, Computing and Graphics; and Enterprise, Embedded and Semi-Custom. Its products include x86 microprocessors as an accelerated processing unit, chipsets, discrete and integrated graphics processing units (GPUs), data center and professional GPUs, and development services; and server and embedded processors, and semi-custom System-on-Chip (SoC) products, development services, and technology for game consoles. The company provides x86 microprocessors for desktop PCs under the AMD Ryzen, AMD Ryzen PRO, Ryzen, Threadripper, AMD A-Series, AMD FX, AMD Athlon, AMD Athlon PRO, and AMD Pro A-Series processors brands; microprocessors for notebook and 2-in-1s under the AMD Ryzen, AMD A-Series, AMD Athlon, AMD Ryzen PRO, AMD Athlon PRO, and AMD Pro A-Series processors brands; microprocessors for servers under the AMD EPYC and AMD Opteron brands; and chipsets under the AMD trademark. It also offers discrete GPUs for desktop and notebook PCs under the AMD Radeon graphics and AMD Embedded Radeon brands; professional graphics products under the AMD Radeon Pro and AMD FirePro graphics brands; and Radeon Instinct and AMD Instinct accelerators for servers. In addition, the company provides embedded processor solutions under the AMD Opteron, AMD Athlon, AMD Geode, AMD Ryzen, AMD EPYC, AMD R-Series, and G-Series processors brands; and customer-specific solutions based on AMD CPU, GPU, and multi-media technologies, as well as semi-custom SoC products. It serves original equipment manufacturers, public cloud service providers, original design manufacturers, system integrators, independent distributors, online retailers, and add-in-board manufacturers through its direct sales force, independent distributors, and sales representatives. Advanced Micro Devices, Inc. was founded in 1969 and is headquartered in Santa Clara, California.',\n",
+              " 'longName': 'Advanced Micro Devices, Inc.',\n",
+              " 'market': 'us_market',\n",
+              " 'marketCap': 110007918592,\n",
+              " 'maxAge': 1,\n",
+              " 'maxSupply': None,\n",
+              " 'messageBoardId': 'finmb_168864',\n",
+              " 'morningStarOverallRating': None,\n",
+              " 'morningStarRiskRating': None,\n",
+              " 'mostRecentQuarter': 1616803200,\n",
+              " 'navPrice': None,\n",
+              " 'netIncomeToCommon': 2883000064,\n",
+              " 'nextFiscalYearEnd': 1672012800,\n",
+              " 'numberOfAnalystOpinions': 34,\n",
+              " 'open': 95.02,\n",
+              " 'openInterest': None,\n",
+              " 'operatingCashflow': 2034000000,\n",
+              " 'operatingMargins': 0.16363001,\n",
+              " 'payoutRatio': 0,\n",
+              " 'pegRatio': 1.35,\n",
+              " 'phone': '408 749 4000',\n",
+              " 'previousClose': 94.47,\n",
+              " 'priceHint': 2,\n",
+              " 'priceToBook': 16.98368,\n",
+              " 'priceToSalesTrailing12Months': 9.63123,\n",
+              " 'profitMargins': 0.25241,\n",
+              " 'quickRatio': 1.851,\n",
+              " 'quoteType': 'EQUITY',\n",
+              " 'recommendationKey': 'buy',\n",
+              " 'recommendationMean': 2.3,\n",
+              " 'regularMarketDayHigh': 95.43,\n",
+              " 'regularMarketDayLow': 90.31,\n",
+              " 'regularMarketOpen': 95.02,\n",
+              " 'regularMarketPreviousClose': 94.47,\n",
+              " 'regularMarketPrice': 90.54,\n",
+              " 'regularMarketVolume': 51498481,\n",
+              " 'returnOnAssets': 0.14682999,\n",
+              " 'returnOnEquity': 0.60605,\n",
+              " 'revenueGrowth': 0.929,\n",
+              " 'revenuePerShare': 9.56,\n",
+              " 'revenueQuarterlyGrowth': None,\n",
+              " 'sector': 'Technology',\n",
+              " 'sharesOutstanding': 1215020032,\n",
+              " 'sharesPercentSharesOut': 0.0715,\n",
+              " 'sharesShort': 86883692,\n",
+              " 'sharesShortPreviousMonthDate': 1620950400,\n",
+              " 'sharesShortPriorMonth': 84074854,\n",
+              " 'shortName': 'Advanced Micro Devices, Inc.',\n",
+              " 'shortPercentOfFloat': 0.0719,\n",
+              " 'shortRatio': 2.43,\n",
+              " 'startDate': None,\n",
+              " 'state': 'CA',\n",
+              " 'strikePrice': None,\n",
+              " 'symbol': 'AMD',\n",
+              " 'targetHighPrice': 169.7,\n",
+              " 'targetLowPrice': 17,\n",
+              " 'targetMeanPrice': 104.79,\n",
+              " 'targetMedianPrice': 108.5,\n",
+              " 'threeYearAverageReturn': None,\n",
+              " 'toCurrency': None,\n",
+              " 'totalAssets': None,\n",
+              " 'totalCash': 3116000000,\n",
+              " 'totalCashPerShare': 2.565,\n",
+              " 'totalDebt': 551000000,\n",
+              " 'totalRevenue': 11422000128,\n",
+              " 'tradeable': False,\n",
+              " 'trailingAnnualDividendRate': None,\n",
+              " 'trailingAnnualDividendYield': None,\n",
+              " 'trailingEps': 2.382,\n",
+              " 'trailingPE': 38.010075,\n",
+              " 'twoHundredDayAverage': 84.16459,\n",
+              " 'volume': 51498481,\n",
+              " 'volume24Hr': None,\n",
+              " 'volumeAllCurrencies': None,\n",
+              " 'website': 'http://www.amd.com',\n",
+              " 'yield': None,\n",
+              " 'ytdReturn': None,\n",
+              " 'zip': '95054'}"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 16
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 35
+        },
+        "id": "5tgZW1db2Bvf",
+        "outputId": "1d3b9dbd-109e-45cc-9e6a-de2acc7a36c2"
+      },
+      "source": [
+        "amd_info[\"country\"]"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "application/vnd.google.colaboratory.intrinsic+json": {
+              "type": "string"
+            },
+            "text/plain": [
+              "'United States'"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 18
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "ZiFhtTfpvVCF"
+      },
+      "source": [
+        "<b>Question 2</b> Use the key  <code>'sector'</code> to find the sector the stock belongs to, remember it as it will be a quiz question.\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 35
+        },
+        "id": "qdZjzu21vVCF",
+        "outputId": "76ac5a89-8c97-4037-dce0-495fcf2c9c2f"
+      },
+      "source": [
+        "amd_info[\"sector\"]"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "application/vnd.google.colaboratory.intrinsic+json": {
+              "type": "string"
+            },
+            "text/plain": [
+              "'Technology'"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 19
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "GUAVHYFbvVCF"
+      },
+      "source": [
+        "<b>Question 3</b> Obtain stock data for AMD using the `history` function, set the `period` to max. Find the `Volume` traded on the first day (first row).\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "NMv8mSqevVCF"
+      },
+      "source": [
+        "amd_share_price_data = amd.history(period= \"max\")"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "BC39ooYA2mnI",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 235
+        },
+        "outputId": "ec365985-60a0-47ba-9cc8-92e92397e13d"
+      },
+      "source": [
+        "amd_share_price_data.head()"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>Open</th>\n",
+              "      <th>High</th>\n",
+              "      <th>Low</th>\n",
+              "      <th>Close</th>\n",
+              "      <th>Volume</th>\n",
+              "      <th>Dividends</th>\n",
+              "      <th>Stock Splits</th>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Date</th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>1980-03-17</th>\n",
+              "      <td>0.0</td>\n",
+              "      <td>3.302083</td>\n",
+              "      <td>3.125000</td>\n",
+              "      <td>3.145833</td>\n",
+              "      <td>219600</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0.0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1980-03-18</th>\n",
+              "      <td>0.0</td>\n",
+              "      <td>3.125000</td>\n",
+              "      <td>2.937500</td>\n",
+              "      <td>3.031250</td>\n",
+              "      <td>727200</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0.0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1980-03-19</th>\n",
+              "      <td>0.0</td>\n",
+              "      <td>3.083333</td>\n",
+              "      <td>3.020833</td>\n",
+              "      <td>3.041667</td>\n",
+              "      <td>295200</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0.0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1980-03-20</th>\n",
+              "      <td>0.0</td>\n",
+              "      <td>3.062500</td>\n",
+              "      <td>3.010417</td>\n",
+              "      <td>3.010417</td>\n",
+              "      <td>159600</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0.0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1980-03-21</th>\n",
+              "      <td>0.0</td>\n",
+              "      <td>3.020833</td>\n",
+              "      <td>2.906250</td>\n",
+              "      <td>2.916667</td>\n",
+              "      <td>130800</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0.0</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>"
+            ],
+            "text/plain": [
+              "            Open      High       Low     Close  Volume  Dividends  Stock Splits\n",
+              "Date                                                                           \n",
+              "1980-03-17   0.0  3.302083  3.125000  3.145833  219600          0           0.0\n",
+              "1980-03-18   0.0  3.125000  2.937500  3.031250  727200          0           0.0\n",
+              "1980-03-19   0.0  3.083333  3.020833  3.041667  295200          0           0.0\n",
+              "1980-03-20   0.0  3.062500  3.010417  3.010417  159600          0           0.0\n",
+              "1980-03-21   0.0  3.020833  2.906250  2.916667  130800          0           0.0"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 22
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "k32IxdRnvVCF"
+      },
+      "source": [
+        "<h2>About the Authors:</h2> \n",
+        "\n",
+        "<a href=\"https://www.linkedin.com/in/joseph-s-50398b136/?utm_medium=Exinfluencer&utm_source=Exinfluencer&utm_content=000026UJ&utm_term=10006555&utm_id=NA-SkillsNetwork-Channel-SkillsNetworkCoursesIBMDeveloperSkillsNetworkPY0220ENSkillsNetwork23455606-2021-01-01\">Joseph Santarcangelo</a> has a PhD in Electrical Engineering, his research focused on using machine learning, signal processing, and computer vision to determine how videos impact human cognition. Joseph has been working for IBM since he completed his PhD.\n",
+        "\n",
+        "Azim Hirjani\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "9_u9DdfmvVCF"
+      },
+      "source": [
+        "## Change Log\n",
+        "\n",
+        "| Date (YYYY-MM-DD) | Version | Changed By    | Change Description        |\n",
+        "| ----------------- | ------- | ------------- | ------------------------- |\n",
+        "| 2020-11-10        | 1.1     | Malika Singla | Deleted the Optional part |\n",
+        "| 2020-08-27        | 1.0     | Malika Singla | Added lab to GitLab       |\n",
+        "\n",
+        "<hr>\n",
+        "\n",
+        "## <h3 align=\"center\"> © IBM Corporation 2020. All rights reserved. <h3/>\n",
+        "\n",
+        "<p>\n"
+      ]
+    }
+  ]
+}
